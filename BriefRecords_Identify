@@ -1,11 +1,12 @@
-
-select ibarcode, location, convert(varchar(12),dateadd(dd,creation_date,'1 jan 1970'),111) as creation_date, n_ckos, convert(varchar(12),dateadd(dd,last_cko_date,'1 jan 1970'),111) as last_cko_date
-from item
-where bib# in (
+/* secondary brief records */
+select i.location, i.ibarcode, t.processed as title, i.collection, i.call_reconstructed, convert(varchar(12),dateadd(dd,i.creation_date,'1 jan 1970'),111) as creation_date, i.n_ckos, convert(varchar(12),dateadd(dd,i.last_cko_date,'1 jan 1970'),111) as last_cko_date
+from item i, title t
+where i.bib# = t.bib#
+and i.bib# in (
 	select distinct bib#
 	from bib
 	where tag = '245'
-	and bib# not in (select bib# from bib where tag = '020' and text like '%')
+--	and bib# not in (select bib# from bib where tag = '020' and text like '%')
 	and bib# not in (select bib# from bib where tag = '260' and text like '%')
 	and bib# not in (select bib# from bib where tag = '264' and text like '%')
 	and bib# not in (select bib# from bib where tag = '300' and text like '%')
@@ -16,12 +17,14 @@ where bib# in (
 	and bib# not in (select bib# from bib where tag = '651')
 	and bib# not in (select bib# from bib where tag = '655')
 	)
-and collection not in ('equip', 'supply')
-and location = 'fhc'
-and n_ckos = 0
-and bib# in (
-	select bib# from item 
-	group by bib# 
-	having count(bib#)<3
-	)
-order by creation_date
+and i.collection not in ('equip', 'supply')
+and ibarcode not like (' D%')
+--and i.n_ckos = 0
+--and i.bib# in (
+--	select i.bib# from item 
+--	group by i.bib# 
+--	having count(i.bib#)<3
+--	)
+and i.location in ('bci','chc','eci','eds','fhc','gci','gps','hrh','jhs','kci','phs','jam','sss','wci','wox')
+order by i.location, i.collection, i.call_reconstructed
+
