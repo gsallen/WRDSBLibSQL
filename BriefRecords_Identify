@@ -28,3 +28,65 @@ and ibarcode not like (' D%')
 and i.location in ('bci','chc','eci','eds','fhc','gci','gps','hrh','jhs','kci','phs','jam','sss','wci','wox')
 order by i.location, i.collection, i.call_reconstructed
 
+/* elementary brief records */
+select i.location, i.ibarcode, t.processed as title, i.collection, i.call_reconstructed, convert(varchar(12),dateadd(dd,i.creation_date,'1 jan 1970'),111) as creation_date, i.n_ckos, convert(varchar(12),dateadd(dd,i.last_cko_date,'1 jan 1970'),111) as last_cko_date
+from item i, title t
+where i.bib# = t.bib#
+and i.bib# in (
+	select distinct bib#
+	from bib
+	where tag = '245'
+--	and bib# not in (select bib# from bib where tag = '020' and text like '%')
+	and bib# not in (select bib# from bib where tag = '260' and text like '%')
+	and bib# not in (select bib# from bib where tag = '264' and text like '%')
+	and bib# not in (select bib# from bib where tag = '300' and text like '%')
+	and bib# not in (select bib# from bib where tag = '600')
+	and bib# not in (select bib# from bib where tag = '610')
+	and bib# not in (select bib# from bib where tag = '630')
+	and bib# not in (select bib# from bib where tag = '650')
+	and bib# not in (select bib# from bib where tag = '651')
+	and bib# not in (select bib# from bib where tag = '655')
+	)
+and i.collection not in ('equip', 'supply')
+and ibarcode not like (' D%')
+--and i.n_ckos = 0
+--and i.bib# in (
+--	select i.bib# from item 
+--	group by i.bib# 
+--	having count(i.bib#)<3
+--	)
+and i.location not in ('acq','ali','demo','lia','ele','nal','bci','chc','eci','eds','fhc','gci','gps','hrh','jhs','kci','phs','jam','sss','wci','wox')
+order by i.location, i.collection, i.call_reconstructed
+
+/* brief record count */
+select location, count(ibarcode)
+from item
+where ibarcode in (
+select ibarcode
+from item
+where bib# in (
+	select distinct bib#
+	from bib
+	where tag = '245'
+--	and bib# not in (select bib# from bib where tag = '020' and text like '%')
+	and bib# not in (select bib# from bib where tag = '260' and text like '%')
+	and bib# not in (select bib# from bib where tag = '264' and text like '%')
+	and bib# not in (select bib# from bib where tag = '300' and text like '%')
+	and bib# not in (select bib# from bib where tag = '600')
+	and bib# not in (select bib# from bib where tag = '610')
+	and bib# not in (select bib# from bib where tag = '630')
+	and bib# not in (select bib# from bib where tag = '650')
+	and bib# not in (select bib# from bib where tag = '651')
+	and bib# not in (select bib# from bib where tag = '655')
+	)
+and collection not in ('equip', 'supply')
+and ibarcode not like (' D%')
+--and i.n_ckos = 0
+--and i.bib# in (
+--	select i.bib# from item 
+--	group by i.bib# 
+--	having count(i.bib#)<3
+--	)
+--and location not in ('bci','chc','eci','eds','fhc','gci','gps','hrh','jhs','kci','phs','jam','sss','wci','wox'))
+group by location
+order by location
