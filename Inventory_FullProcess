@@ -1,0 +1,91 @@
+/* mis-scan cleanup */
+select ibarcode, call_reconstructed
+from item
+where location ='xxx'
+and ibarcode like '% _ %'
+
+
+/* summary of collection */
+select collection, count(collection) as #_in_collection
+from item
+where location = 'xxx'
+group by collection
+
+select item_status, count(item_status)
+from item
+where location = 'xxx'
+group by item_status
+
+/* run first to get accurate count of items in library */
+select COUNT(*)
+from item
+where location = 'cnc'
+and item_status in ('i', 'ci')
+
+/* clear temp_inventory table */
+Drop table temp_inventory
+go
+create table temp_inventory(ibarcode varchar(15))
+go
+create index tb on temp_inventory(ibarcode)
+go
+grant all on temp_inventory to staffgroup 
+
+/* run runBCPinv.bat */
+/* check numbers */
+select COUNT(*)
+from temp_inventory
+
+/* see if any of those ibarcodes don't correspond to item records */
+select * from temp_inventory where ibarcode not in (select ibarcode from item)
+order by ibarcode
+
+/* search for dups */
+select ibarcode, count(*)
+from temp_inventory
+group by ibarcode
+having count(*)>1
+
+/* prev two queries in one (not working) */
+/*attempt to get a more accurate number since a scan could be both dup and not in Horizon */
+select ibarcode, count(ibarcode)
+from temp_inventory
+where ibarcode not in (select ibarcode from item)
+group by ibarcode
+having count(ibarcode)>1
+
+/* where clause: location = 'xxx' and item_status in ('ci', 'i') and ibarcode not in (select ibarcode from temp_inventory) then: set as 'mi' */
+
+/* Missing List Report */
+select i.ibarcode as 'item_barcode', i.collection, i.call_reconstructed as 'call#', t.processed as 'title'
+from item i, title t
+where location = 'xxx'
+and item_status = 'mi'
+and i.bib# = t.bib#
+order by i.collection, i.call_reconstructed
+
+/* Final Deletes Report for clerks */
+select i.ibarcode as 'item_barcode', i.collection, i.call_reconstructed as 'call#', t.processed as 'title', convert(varchar(12),dateadd(dd,i.last_cko_date,'1 jan 1970'),103) as last_cko_date
+from item i, title t
+where location = 'xxx'
+and item_status = 'mi'
+and i.bib# = t.bib#
+order by i.last_cko_date DESC, i.collection, i.call_reconstructed
+
+/* Final deletes report for DLSTs */
+select t.processed as 'title', i.call_reconstructed as 'call#', i.collection,  i.n_ckos, convert(varchar(12),dateadd(dd,i.creation_date,'1 jan 1970'),103) as creation_date, convert(varchar(12),dateadd(dd,i.last_cko_date,'1 jan 1970'),103) as last_cko_date
+from item i, title t
+where location = 'xxx'
+and item_status = 'mi'
+and i.bib# = t.bib#
+order by i.n_ckos DESC
+
+/* counts */
+select location, count(ibarcode)
+from item
+--where location in ('abe','ced','cor','dri','gvc','gvn','dar','lrw','lbp','man','maj','nam','nlw','stj')
+and item_status = 'mi'
+group by location
+
+/* Email report to clerk, wait for reply, delete */
+/* To delete:  Batch item delete > item_status = 'mi' and location in ('','','') */
