@@ -1,0 +1,16 @@
+
+/*when given a date code, enter value in place of xxxxx in line below to convert to readable value*/
+select DATEadd(dd,xxxxx, 'jan 1 1970')
+select DATEadd(dd,15672, 'jan 1 1970')
+
+/*simple use of getdate:*/
+select getdate()
+
+/*calculating 'jan 4 2013' in julian dates*/
+select datediff (dd,'1 jan 1970','4 jan 2013')
+
+/*calculating today's date using datediff and getdate()*/
+select datediff (dd,'1 jan 1970',getdate())
+
+/* to convert date to a truncated dd/mm/yyyy format  */
+convert(varchar(12),dateadd(dd,date_field,'1 jan 1970'),103)
