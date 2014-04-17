@@ -13,3 +13,4 @@ select name from location
 go
 select mt_url from matham
 go
+
