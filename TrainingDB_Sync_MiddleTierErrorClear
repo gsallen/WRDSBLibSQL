@@ -1,0 +1,15 @@
+use training
+go
+update location
+set name=name+' *** NOTE:  YOU ARE IN THE TRAINING DATABASE ***'
+go
+update matham
+set mt_url='TRAININGDatabase:1099'
+go
+update matham
+set mt_version = 0
+go
+select name from location
+go
+select mt_url from matham
+go
