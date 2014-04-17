@@ -1,0 +1,22 @@
+/* find all 586 notes */
+select bib#, text
+from bib
+where tag = '586'
+and text like '%.' + char(30)
+order by bib#
+
+/* find all 586 notes where ... grouped */
+select text, count(bib#)
+from bib
+where tag = '586'
+and text like '%' + char(31) + 'a' + 'Prix Tamarac' + '%' 
+group by text
+
+/* find all 586 notes where ... */
+select text, bib#
+from bib
+where tag = '586'
+and text like '%' + char(31) + 'a' + 'Evergreen' + '%'
+
+/* other FoR notes */
+-- ('Blue Spruce', 'Silver Birch', 'Red Maple', 'White Pine', 'Evergreen', 'Prix Tamarac', 'Prix Peuplier')
