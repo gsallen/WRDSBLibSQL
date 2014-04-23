@@ -1,0 +1,41 @@
+/* creates a note keyword index in Horizon */
+drop table notekw_word
+create table notekw_word(bib# int, word# int)
+create index notekw_bib#_index on notekw_word(bib#)
+create clustered index notekw_word_index on notekw_word(word#, bib#)
+alter table word add n_notekws zero_int NULL
+grant select on notekw_word to guest, ipac, staff
+grant all on notekw_word to staff
+
+
+  CREATE TRIGGER notekw_word_d_trig
+  on notekw_word
+  for DELETE
+  AS
+    UPDATE word
+      set n_notekws = n_notekws - 1
+      FROM word w, deleted d
+      WHERE w.word# = d.word#
+        AND w.n_notekws > 0
+ RETURN
+
+
+   CREATE TRIGGER notekw_word_u_trig
+ on notekw_word
+ for UPDATE
+ AS
+  IF @@rowcount > 0
+  BEGIN
+  ROLLBACK transaction
+  RAISERROR 20001 'Cannot update notekw_word directly. Use Horizon software.'        
+  RETURN
+ END
+  RETURN
+
+sp_help notekw_word
+sp_help bib_word
+sp_helpuser
+sp_helptext bib_word_d_trig
+sp_helptext bib_word_u_trig
+
+select * from notekw_word
