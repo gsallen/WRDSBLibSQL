@@ -1,0 +1,12 @@
+/* TEST: extract the character length of a bib and compare to record length in leader
+If they match, I may be able to write a script that allows editing of MARC records in SQL */
+
+select bib#, sum(LEN(text)) as length_of_text
+from bib
+group by bib#
+having sum(LEN(text)) > convert(int,substring(text,1,5))
+
+select bib#, substring(text,1,5)
+from bib
+where tag = '000'
+and bib# = 133445
