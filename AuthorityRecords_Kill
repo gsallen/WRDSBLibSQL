@@ -1,0 +1,31 @@
+/* A lone authority is no authority... */
+select auth#, n_bibs, processed
+from series
+where n_bibs = 0
+
+select auth#, n_bibs, processed
+from author
+where n_bibs = 0
+
+select auth#, n_bibs, processed
+from subject
+where n_bibs = 0
+
+/* Create temporary auth killing table */
+CREATE TABLE auths_to_the_slaughter(auth# int)
+GO
+CREATE UNIQUE CLUSTERED INDEX auths_to_the_slaughter_idx
+ON auths_to_the_slaughter(auth#)
+WITH ignore_dup_key
+GO
+
+/* Populate temporary auth killing table */
+DELETE auths_to_the_slaughter
+GO
+INSERT auths_to_the_slaughter(auth#)
+SELECT auth#
+FROM --table name
+WHERE n_bibs = 0
+GO
+
+/* Then run KILLAUTH.exe on temp table auths_to_the_slaughter */
