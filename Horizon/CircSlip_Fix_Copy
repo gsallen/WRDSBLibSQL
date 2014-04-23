@@ -1,0 +1,24 @@
+/* use this script to fix circ_slip printing error */
+/* change sourceloc to working location code and newguy to broken location code */
+declare @copy_loc varchar(7), @new_loc varchar(7) select @copy_loc = 'sourceloc' 
+select @new_loc = 'newguy'
+insert circ_slip_field(circ_slip, location, section,ord,circ_slip_field_type,label,field_column,append_to_prev,
+justify,max_field_len,min_field_len,data_mask)
+select circ_slip, @new_loc,
+section,ord,circ_slip_field_type,label,field_column,append_to_prev,
+justify,max_field_len, min_field_len,data_mask
+from circ_slip_field where location = @copy_loc
+
+/* use this script to copy circ_slip settings from one location to another */
+/* change sourceloc to template location and newguy to new location */
+/* change all instances of 'refund' for other types of circ_slips */
+delete from circ_slip_field where location = 'newguy' and circ_slip = 'refund'
+go
+declare @copy_loc varchar(7), @new_loc varchar(7) select @copy_loc = 'SourceLoc' 
+select @new_loc = 'NewGuy' 
+insert circ_slip_field(circ_slip, location, section,ord,circ_slip_field_type,label,field_column,append_to_prev,
+justify,max_field_len,min_field_len,data_mask)
+select circ_slip, @new_loc,
+section,ord,circ_slip_field_type,label,field_column,append_to_prev,
+justify,max_field_len, min_field_len,data_mask
+from circ_slip_field where circ_slip = 'refund' and location = @copy_loc
