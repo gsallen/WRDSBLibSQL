@@ -4,7 +4,6 @@ from item
 where location ='xxx'
 and ibarcode like '% _ %'
 
-
 /* summary of collection */
 select collection, count(collection) as #_in_collection
 from item
