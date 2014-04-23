@@ -1,4 +1,5 @@
 
+
 /*when given a date code, enter value in place of xxxxx in line below to convert to readable value*/
 select DATEadd(dd,xxxxx, 'jan 1 1970')
 select DATEadd(dd,15672, 'jan 1 1970')
@@ -14,3 +15,10 @@ select datediff (dd,'1 jan 1970',getdate())
 
 /* to convert date to a truncated dd/mm/yyyy format  */
 convert(varchar(12),dateadd(dd,date_field,'1 jan 1970'),103)
+
+/* find specific dates */
+select creation_date, convert(varchar(12),dateadd(dd,creation_date,'1 jan 1970'),103) as date_fixed
+from item
+where creation_date > 13000 and creation_date < 17000
+group by creation_date
+order by creation_date DESC
